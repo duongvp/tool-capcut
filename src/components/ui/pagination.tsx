@@ -61,8 +61,8 @@ export function Pagination({
                     ) : (
                         <Button
                             key={i}
-                            variant={page === currentPage ? "translate" : "outline"}
-                            size="sm"
+                            variant={page === currentPage ? "outlineBlue" : "outline"}
+                            size="md"
                             onClick={() => onPageChange(page as number)}
                         >
                             {page}

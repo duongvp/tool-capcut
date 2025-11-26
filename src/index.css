@@ -20,11 +20,12 @@
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  --background-content: oklch(0.97 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #1677ff;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -50,6 +51,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --ck-border-radius: 8px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -68,6 +71,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
+  --color-background-content: var(--background-content);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -141,4 +145,30 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.ck-editor__editable_inline {
+  min-height: 300px; /* Set a minimum height */
+  height: auto; /* Allow height to adjust based on content if desired */
+  overflow-y: auto; /* Add a scrollbar if content exceeds height */
+}
+
+.cke_chrome {
+  border-radius: 10px !important;
+  border: 1px solid #695656;
+  border-width: thin;
+}
+
+/* 1. CSS cho nội dung Editor được render ra */
+.ck-content .image {
+  /* Đảm bảo ảnh được hiển thị là một widget (thẻ <figure>) */
+  margin: 0 auto;
+}
+
+/* 2. Căn trái: Kiểu 'side' (text bao quanh) */
+.ck-content .image-style-side {
+  float: left; /* Đưa ảnh về bên trái */
+  margin-right: var(--ck-image-style-spacing); /* Tạo khoảng trống giữa ảnh và text */
+  max-width: 50%; /* Giới hạn kích thước ảnh side */
+  /* Nếu muốn căn phải, bạn có thể tạo thêm một class CSS riêng */
 }

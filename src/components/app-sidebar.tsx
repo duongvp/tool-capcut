@@ -13,6 +13,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import type { MenuItem } from "@/types/menu"
 import Dashboard from "@/features/dashboard/page"
 import SplitVoice from "@/features/splitVoice/page"
+import Blog from "@/features/blog/page"
+import BlogCreate from "@/features/blog/create/page"
 import { Link } from "react-router-dom"
 
 // Menu items
@@ -75,6 +77,8 @@ import { Link } from "react-router-dom"
 
 export const items: MenuItem[] = [
     { title: "Dashboard", path: "/", element: <Dashboard /> },
+    { title: "Blog", path: "/blog", element: <Blog /> },
+    { title: "Blog", path: "/blog/create", element: <BlogCreate /> },
     { title: "Split Voice", path: "/split-voice", element: <SplitVoice /> },
     {
         title: "Settings",
@@ -123,7 +127,7 @@ export const sidebarGroups = [
         items,
     },
     {
-        label: "ChatGPT",
+        label: "Projects",
         items: items2,
     },
 ]
@@ -131,12 +135,12 @@ export const sidebarGroups = [
 export function AppSidebar() {
     return (
         <Sidebar>
-            <SidebarContent>
+            <SidebarContent className="bg-white border-0 outline-0">
                 {sidebarGroups.map((group) => (
                     <SidebarGroup key={group.label}>
                         <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
                         <SidebarGroupContent>
-                            <SidebarMenu>{renderMenuItems(group.items)}</SidebarMenu>
+                            <SidebarMenu className="border-0">{renderMenuItems(group.items)}</SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
                 ))}
