@@ -20,7 +20,8 @@ import {
     FormControl,
     FormMessage,
 } from "@/components/ui/form"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import PasswordInput from "@/components/password-input"
 
 // ✅ Zod schema
 const formSchema = z.object({
@@ -30,15 +31,17 @@ const formSchema = z.object({
 
 export default function LoginPage() {
     // const router = useRouter()
+    const navigate = useNavigate();
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: { email: "", password: "" },
     })
 
+
     const onSubmit = (values: any) => {
         console.log("Login data: ", values)
-        // router.push("/message")
+        navigate("/blog")
         // API call here ✅
     }
 
@@ -80,15 +83,24 @@ export default function LoginPage() {
                                             <FormLabel>Mật khẩu</FormLabel>
                                         </div>
                                         <FormControl>
-                                            <Input type="password" {...field} />
+                                            <PasswordInput
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder="Nhập mật khẩu"
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </div>
-                        <div className="flex w-full justify-end mt-2">
-                            <Link to="/forgot-password" className="ml-auto text-sm underline-offset-4 hover:underline">Quên mật khẩu?</Link>
+                        <div className="flex w-full justify-end mt-3">
+                            <Link
+                                to="/login"
+                                className="inline-block text-sm underline-offset-4 hover:underline pl-1 text-primary"
+                            >
+                                Quên mật khẩu?
+                            </Link>
                         </div>
 
                         <CardFooter className="flex-col gap-2 mt-4 px-0">

@@ -31,14 +31,13 @@ interface ForgotPasswordFormProps {
 // ✅ Zod schema
 const formSchema = z.object({
     email: z.string().min(1, "Email không được để trống").email("Email không đúng định dạng"),
-    password: z.string().min(1, "Mật khẩu không được để trống"),
 })
 
 export default function ForgotPasswordForm({ setStep, setEmail, handleLoginBack }: ForgotPasswordFormProps) {
     // const router = useRouter()
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues: { email: "", password: "" },
+        defaultValues: { email: "" },
     })
 
     const onSubmit = (values: any) => {
@@ -81,15 +80,15 @@ export default function ForgotPasswordForm({ setStep, setEmail, handleLoginBack 
                             <Button type="submit" className="w-full">
                                 Gửi yêu cầu
                             </Button>
-                            <p className="text-sm ">
-                                Quay lại trang
+                            <div className="text-center text-sm">
+                                Quay lại trang{" "}
                                 <Link
                                     to="/login"
-                                    className="ml-auto inline-block underline-offset-4 hover:underline pl-1"
+                                    className="inline-block underline-offset-4 hover:underline pl-1 text-primary"
                                 >
                                     Đăng nhập
                                 </Link>
-                            </p>
+                            </div>
                         </CardFooter>
                     </form>
                 </Form>

@@ -7,11 +7,9 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import {
     Form,
     FormField,
@@ -21,11 +19,15 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Link } from "react-router-dom"
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from "@/components/ui/input-otp"
 
-// ✅ Zod schema
+// ✅ Zod schema cho OTP - chỉ cần mã OTP
 const formSchema = z.object({
-    email: z.string().min(1, "Email không được để trống").email("Email không đúng định dạng"),
-    password: z.string().min(1, "Mật khẩu không được để trống"),
+    otp: z.string().min(6, "Mã OTP phải có 6 ký tự").max(6, "Mã OTP phải có 6 ký tự"),
 })
 
 interface OTPVerificationProps {
@@ -36,61 +38,97 @@ interface OTPVerificationProps {
 }
 
 export default function OTPVerification({ setStep, email, handleLoginBack, setResetToken }: OTPVerificationProps) {
-    // const router = useRouter()
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues: { email: "", password: "" },
+        defaultValues: { otp: "" },
     })
 
-    const onSubmit = (values: any) => {
-        console.log("Login data: ", values)
-        // router.push("/message")
-        // API call here ✅
-        setStep(3);
+    const onSubmit = (values: z.infer<typeof formSchema>) => {
+        console.log("OTP verification data: ", values)
+
+        // Giả lập xác thực OTP
+        // await api.verifyOTP({ email, otp: values.otp });
+
+        setResetToken(values.otp); // Lưu token reset
+        setStep(3); // Chuyển đến step tiếp theo
+    }
+
+    const handleResendOTP = () => {
+        // Gửi lại mã OTP
+        console.log("Resending OTP to:", email);
+        // await api.resendOTP(email);
+        alert("Mã OTP đã được gửi lại!");
     }
 
     return (
         <Card className="w-full max-w-sm">
-            <CardHeader>
+            <CardHeader className="text-center">
                 <CardTitle className="text-2xl">Xác thực OTP</CardTitle>
                 <CardDescription className="text-sm">
-                    Nhập mã OTP gửi đến {email}
+                    Nhập mã OTP 6 số đã được gửi đến
+                </CardDescription>
+                <CardDescription className="font-medium text-primary">
+                    {email}
                 </CardDescription>
             </CardHeader>
 
             <CardContent>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <div className="flex flex-col gap-6">
-                            {/* Email */}
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }: { field: any }) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="m@example.com" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <CardFooter className="flex-col gap-2 mt-4 px-0">
-                            <Button type="submit" className="w-fit">
-                                Xác thực
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        {/* OTP Field */}
+                        <FormField
+                            control={form.control}
+                            name="otp"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col items-center">
+                                    <FormControl>
+                                        <InputOTP
+                                            maxLength={6}
+                                            {...field}
+                                        >
+                                            <InputOTPGroup>
+                                                <InputOTPSlot index={0} />
+                                                <InputOTPSlot index={1} />
+                                                <InputOTPSlot index={2} />
+                                                <InputOTPSlot index={3} />
+                                                <InputOTPSlot index={4} />
+                                                <InputOTPSlot index={5} />
+                                            </InputOTPGroup>
+                                        </InputOTP>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Resend OTP */}
+                        <div className="text-center text-sm">
+                            Không nhận được mã?{" "}
+                            <Button
+                                type="button"
+                                variant="link"
+                                className="p-0 h-auto"
+                                onClick={handleResendOTP}
+                            >
+                                Gửi lại mã OTP
                             </Button>
-                            <p className="text-sm ">
-                                Quay lại trang
-                                <Link
-                                    to="/login"
-                                    className="ml-auto inline-block underline-offset-4 hover:underline pl-1"
-                                >
-                                    Đăng nhập
-                                </Link>
-                            </p>
-                        </CardFooter>
+                        </div>
+
+                        {/* Submit Button */}
+                        <Button type="submit" className="w-full">
+                            Xác thực
+                        </Button>
+
+                        {/* Back to Login */}
+                        <div className="text-center text-sm">
+                            Quay lại trang{" "}
+                            <Link
+                                to="/login"
+                                className="inline-block underline-offset-4 hover:underline pl-1 text-primary"
+                            >
+                                Đăng nhập
+                            </Link>
+                        </div>
                     </form>
                 </Form>
             </CardContent>

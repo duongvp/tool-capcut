@@ -11,10 +11,11 @@ import {
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import type { MenuItem } from "@/types/menu"
-import Dashboard from "@/features/dashboard/page"
-import SplitVoice from "@/features/splitVoice/page"
-import Blog from "@/features/blog/page"
-import BlogCreate from "@/features/blog/create/page"
+import Dashboard from "@/features/admin/dashboard/page"
+import SplitVoice from "@/features/admin/splitVoice/page"
+import Blog from "@/features/admin/blog/page"
+import BlogCreate from "@/features/admin/blog/create/page"
+import Users from "@/features/admin/user/page"
 import { Link } from "react-router-dom"
 
 // Menu items
@@ -98,6 +99,7 @@ export const items: MenuItem[] = [
         ],
     },
     { title: "Calendar", path: "/calendar", element: <div>Calendar Page</div> },
+    { title: "Quản trị viên", path: "/users", element: <Users /> },
     { title: "Search", path: "/search", element: <div>Search Page</div> },
 ]
 

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import ForgotPasswordForm from "./components/ForgotPasswordForm"
 import OTPVerification from "./components/OTPVerification"
+import ResetPasswordForm from "./components/ResetPasswordForm";
 
 export default function ForgotPasswordPage() {
     const [step, setStep] = useState(1);
@@ -24,14 +25,13 @@ export default function ForgotPasswordPage() {
                     setResetToken={() => { }}
                 />
             )}
-            {/* {step === 3 && (
-                <OTPVerification
-                    email={email}
+            {step === 3 && (
+                <ResetPasswordForm
+                    // setEmail={setEmail}
                     setStep={setStep}
                     handleLoginBack={handleLoginBack}
-                    setResetToken={() => { }}
                 />
-            )} */}
+            )}
         </>
     )
 }
