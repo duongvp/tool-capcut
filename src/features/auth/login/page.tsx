@@ -96,7 +96,7 @@ export default function LoginPage() {
                         </div>
                         <div className="flex w-full justify-end mt-3">
                             <Link
-                                to="/login"
+                                to="/forgot-password"
                                 className="inline-block text-sm underline-offset-4 hover:underline pl-1 text-primary"
                             >
                                 Quên mật khẩu?

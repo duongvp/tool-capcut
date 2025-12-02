@@ -1,16 +1,13 @@
+// pages/AdminPostList.tsx
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useNavigate } from "react-router-dom";
-
-// icons
-import { Pencil, Trash2, PlusCircle, Plus, Minus } from "lucide-react";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
-
+import { ExpandableTable } from "@/components/expandable-table";
 const fakePosts = [
     {
         id: 1,
@@ -50,31 +47,10 @@ const fakePosts = [
     },
 ];
 
-// Custom icon component với animation
-const ExpandIcon = ({ isExpanded }: { isExpanded: boolean }) => {
-    return (
-        <div className="relative !h-3.5 !w-3.5 flex items-center justify-center">
-            <div className={`
-                absolute transition-all duration-200 ease-in-out
-                ${isExpanded ? 'scale-0 rotate-90 opacity-0' : 'scale-100 rotate-0 opacity-100'}
-            `}>
-                <Plus className="!h-3.5 !w-3.5" /> {/* Sử dụng thuộc tính size */}
-            </div>
-            <div className={`
-                absolute transition-all duration-200 ease-in-out
-                ${isExpanded ? 'scale-100 rotate-0 opacity-100' : 'scale-0 -rotate-90 opacity-0'}
-            `}>
-                <Minus className="!h-3.5 !w-3.5" /> {/* Sử dụng thuộc tính size */}
-            </div>
-        </div>
-    );
-};
-
 export default function AdminPostList() {
     const navigate = useNavigate();
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -86,160 +62,138 @@ export default function AdminPostList() {
     const deletePost = (id: number) => {
         if (!confirm("Xác nhận xóa bài viết?")) return;
         setPosts((prev) => prev.filter((p) => p.id !== id));
-        setExpandedRows((prev) => prev.filter((rowId) => rowId !== id));
     };
 
-    const toggleRow = (id: number) => {
-        setExpandedRows((prev) =>
-            prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
-        );
-    };
+    // Định nghĩa columns
+    const columns = [
+        {
+            key: "title",
+            header: "Tiêu đề",
+            render: (post: any) => <span className="font-medium">{post.title}</span>
+        },
+        {
+            key: "category",
+            header: "Danh mục",
+            render: (post: any) => <Badge variant="outline">{post.category}</Badge>
+        },
+        {
+            key: "createdAt",
+            header: "Ngày đăng",
+            render: (post: any) =>
+                new Date(post.createdAt).toLocaleDateString("vi-VN")
+        },
+        {
+            key: "status",
+            header: "Trạng thái",
+            render: (post: any) =>
+                post.status ? (
+                    <Badge className="bg-green-500 text-white">Đã đăng</Badge>
+                ) : (
+                    <Badge variant="secondary">Nháp</Badge>
+                )
+        }
+    ];
 
-    const isExpanded = (id: number) => expandedRows.includes(id);
+    // Content khi expand
+    const expandedContent = (post: any) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="space-y-3">
+                <div>
+                    <span className="font-medium">Mô tả:</span>
+                    <p className="text-muted-foreground mt-1">
+                        {post.description}
+                    </p>
+                </div>
+                <div>
+                    <span className="font-medium">Tác giả:</span>
+                    <span className="text-muted-foreground ml-2">
+                        {post.author}
+                    </span>
+                </div>
+            </div>
+            <div className="space-y-3">
+                <div>
+                    <span className="font-medium">Lượt xem:</span>
+                    <span className="text-muted-foreground ml-2">
+                        {post.views.toLocaleString()}
+                    </span>
+                </div>
+                <div>
+                    <span className="font-medium">Tags:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                        {post.tags.map((tag: string, index: number) => (
+                            <Badge
+                                key={index}
+                                variant="secondary"
+                                className="text-xs"
+                            >
+                                {tag}
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+                <div>
+                    <span className="font-medium">Hình ảnh:</span>
+                    <div className="mt-1">
+                        <img
+                            src={post.thumbnail}
+                            alt={post.title}
+                            className="w-16 h-16 object-cover rounded border"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    // Actions cho mỗi row
+    const actions = (post: any) => (
+        <>
+            <Button
+                size="sm"
+                variant="outline"
+                data-action="edit"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/admin/posts/${post.id}/edit`);
+                }}
+            >
+                <Pencil className="w-4 h-4" />
+            </Button>
+            <Button
+                size="sm"
+                variant="destructive"
+                data-action="delete"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    deletePost(post.id);
+                }}
+            >
+                <Trash2 className="w-4 h-4" />
+            </Button>
+        </>
+    );
 
     return (
         <Card className="w-full h-full border-0 shadow-none rounded-md">
             <CardHeader className="flex flex-row items-center justify-end py-3">
                 <Button onClick={() => navigate("/blog/create")}>
-                    <PlusCircle className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4" />
                     Người dùng
                 </Button>
             </CardHeader>
 
             <CardContent>
-                {loading ? (
-                    <div className="text-center py-8 text-muted-foreground">Đang tải dữ liệu...</div>
-                ) : posts.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">Chưa có bài viết nào</div>
-                ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-10"></TableHead>
-                                <TableHead>Tiêu đề</TableHead>
-                                <TableHead>Danh mục</TableHead>
-                                <TableHead>Ngày đăng</TableHead>
-                                <TableHead>Trạng thái</TableHead>
-                                <TableHead className="text-right">Hành động</TableHead>
-                            </TableRow>
-                        </TableHeader>
-
-                        <TableBody>
-                            {posts.map((post) => (
-                                <Collapsible
-                                    key={post.id}
-                                    open={isExpanded(post.id)}
-                                    onOpenChange={() => toggleRow(post.id)}
-                                    asChild
-                                >
-                                    <>
-                                        <TableRow className="group">
-                                            <TableCell>
-                                                <CollapsibleTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-6 w-6 p-0 hover:bg-accent border rounded transition-all duration-200"
-                                                    >
-                                                        <ExpandIcon isExpanded={isExpanded(post.id)} />
-                                                    </Button>
-                                                </CollapsibleTrigger>
-                                            </TableCell>
-                                            <TableCell className="font-medium">{post.title}</TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline">{post.category}</Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                {new Date(post.createdAt).toLocaleDateString("vi-VN")}
-                                            </TableCell>
-                                            <TableCell>
-                                                {post.status ? (
-                                                    <Badge className="bg-green-500 text-white">Đã đăng</Badge>
-                                                ) : (
-                                                    <Badge variant="secondary">Nháp</Badge>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end space-x-2">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        onClick={() => navigate(`/admin/posts/${post.id}/edit`)}
-                                                    >
-                                                        <Pencil className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="destructive"
-                                                        onClick={() => deletePost(post.id)}
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-
-                                        <TableRow className={isExpanded(post.id) ? "bg-muted/50" : "hidden"}>
-                                            <TableCell colSpan={6} className="p-0">
-                                                <CollapsibleContent className="p-4 transition-all duration-200 ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                                        <div className="space-y-3">
-                                                            <div>
-                                                                <span className="font-medium">Mô tả:</span>
-                                                                <p className="text-muted-foreground mt-1">
-                                                                    {post.description}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <span className="font-medium">Tác giả:</span>
-                                                                <span className="text-muted-foreground ml-2">
-                                                                    {post.author}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="space-y-3">
-                                                            <div>
-                                                                <span className="font-medium">Lượt xem:</span>
-                                                                <span className="text-muted-foreground ml-2">
-                                                                    {post.views.toLocaleString()}
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                <span className="font-medium">Tags:</span>
-                                                                <div className="flex flex-wrap gap-1 mt-1">
-                                                                    {post.tags.map((tag: string, index: number) => (
-                                                                        <Badge
-                                                                            key={index}
-                                                                            variant="secondary"
-                                                                            className="text-xs"
-                                                                        >
-                                                                            {tag}
-                                                                        </Badge>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <span className="font-medium">Hình ảnh:</span>
-                                                                <div className="mt-1">
-                                                                    <img
-                                                                        src={post.thumbnail}
-                                                                        alt={post.title}
-                                                                        className="w-16 h-16 object-cover rounded border"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </CollapsibleContent>
-                                            </TableCell>
-                                        </TableRow>
-                                    </>
-                                </Collapsible>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
+                <ExpandableTable
+                    data={posts}
+                    columns={columns}
+                    expandedContent={expandedContent}
+                    loading={loading}
+                    emptyMessage="Chưa có bài viết nào"
+                    actions={actions}
+                />
             </CardContent>
+
             <CardFooter className="flex justify-end">
                 <Pagination totalItems={posts.length} pageSize={5} currentPage={1} onPageChange={() => { }} />
             </CardFooter>
