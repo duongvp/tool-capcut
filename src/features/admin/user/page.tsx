@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, MessageSquare, History, FileText } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import { ExpandableTable } from "@/components/expandable-table";
+
 const fakePosts = [
     {
         id: 1,
@@ -19,32 +20,22 @@ const fakePosts = [
         description: "Bài viết giới thiệu về công ty ABC và các dịch vụ chính.",
         author: "Admin",
         views: 1500,
-        tags: ["giới thiệu", "công ty"]
+        tags: ["giới thiệu", "công ty"],
+        comments: [
+            { id: 1, user: "User1", content: "Bài viết hay", date: "2025-11-02" },
+            { id: 2, user: "User2", content: "Rất hữu ích", date: "2025-11-03" }
+        ],
+        history: [
+            { date: "2025-11-01", action: "Tạo bài viết", user: "Admin" },
+            { date: "2025-11-02", action: "Cập nhật", user: "Editor" }
+        ],
+        stats: {
+            likes: 45,
+            shares: 12,
+            comments: 8
+        }
     },
-    {
-        id: 2,
-        title: "Dự án phần mềm quản lý ERP",
-        category: "du-an",
-        thumbnail: "https://picsum.photos/200/200?2",
-        status: true,
-        createdAt: "2025-11-02",
-        description: "Triển khai hệ thống ERP cho doanh nghiệp vừa và nhỏ.",
-        author: "Manager",
-        views: 890,
-        tags: ["ERP", "phần mềm"]
-    },
-    {
-        id: 3,
-        title: "Công nghệ AI trong doanh nghiệp",
-        category: "cong-nghe",
-        thumbnail: "https://picsum.photos/200/200?3",
-        status: false,
-        createdAt: "2025-11-03",
-        description: "Ứng dụng trí tuệ nhân tạo trong quản lý doanh nghiệp.",
-        author: "Tech Lead",
-        views: 450,
-        tags: ["AI", "công nghệ"]
-    },
+    // ... other posts
 ];
 
 export default function AdminPostList() {
@@ -94,57 +85,134 @@ export default function AdminPostList() {
         }
     ];
 
-    // Content khi expand
-    const expandedContent = (post: any) => (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="space-y-3">
-                <div>
-                    <span className="font-medium">Mô tả:</span>
-                    <p className="text-muted-foreground mt-1">
-                        {post.description}
-                    </p>
-                </div>
-                <div>
-                    <span className="font-medium">Tác giả:</span>
-                    <span className="text-muted-foreground ml-2">
-                        {post.author}
-                    </span>
-                </div>
-            </div>
-            <div className="space-y-3">
-                <div>
-                    <span className="font-medium">Lượt xem:</span>
-                    <span className="text-muted-foreground ml-2">
-                        {post.views.toLocaleString()}
-                    </span>
-                </div>
-                <div>
-                    <span className="font-medium">Tags:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                        {post.tags.map((tag: string, index: number) => (
-                            <Badge
-                                key={index}
-                                variant="secondary"
-                                className="text-xs"
-                            >
-                                {tag}
-                            </Badge>
-                        ))}
+    // Định nghĩa tabs với icon nếu muốn
+    const tabs = [
+        {
+            key: "details",
+            label: "Thông tin",
+            content: (post: any) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div className="space-y-4">
+                        <div>
+                            <h4 className="font-medium text-gray-700 mb-2">Mô tả</h4>
+                            <p className="text-gray-600">{post.description}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <span className="text-gray-500 block text-sm">Tác giả</span>
+                                <span className="font-medium">{post.author}</span>
+                            </div>
+                            <div>
+                                <span className="text-gray-500 block text-sm">Lượt xem</span>
+                                <span className="font-medium">{post.views.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <h4 className="font-medium text-gray-700 mb-2">Thống kê</h4>
+                            <div className="grid grid-cols-3 gap-2">
+                                <div className="text-center p-2 bg-blue-50 rounded">
+                                    <div className="font-bold text-blue-600">{post.stats?.likes || 0}</div>
+                                    <div className="text-xs text-gray-500">Likes</div>
+                                </div>
+                                <div className="text-center p-2 bg-green-50 rounded">
+                                    <div className="font-bold text-green-600">{post.stats?.shares || 0}</div>
+                                    <div className="text-xs text-gray-500">Shares</div>
+                                </div>
+                                <div className="text-center p-2 bg-purple-50 rounded">
+                                    <div className="font-bold text-purple-600">{post.stats?.comments || 0}</div>
+                                    <div className="text-xs text-gray-500">Comments</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 className="font-medium text-gray-700 mb-2">Tags</h4>
+                            <div className="flex flex-wrap gap-1">
+                                {post.tags.map((tag: string, index: number) => (
+                                    <Badge
+                                        key={index}
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <span className="font-medium">Hình ảnh:</span>
-                    <div className="mt-1">
-                        <img
-                            src={post.thumbnail}
-                            alt={post.title}
-                            className="w-16 h-16 object-cover rounded border"
-                        />
-                    </div>
+            )
+        },
+        {
+            key: "comments",
+            label: "Bình luận",
+            content: (post: any) => (
+                <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                    {post.comments && post.comments.length > 0 ? (
+                        post.comments.map((comment: any) => (
+                            <div key={comment.id} className="border-l-2 border-blue-500 pl-4 py-3 bg-blue-50/50 rounded-r">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <span className="text-xs font-bold text-blue-600">
+                                                {comment.user.charAt(0)}
+                                            </span>
+                                        </div>
+                                        <span className="font-medium text-sm">{comment.user}</span>
+                                    </div>
+                                    <span className="text-xs text-gray-500">
+                                        {new Date(comment.date).toLocaleDateString("vi-VN")}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-gray-700 mt-2 ml-8">{comment.content}</p>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-8">
+                            <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                            <p className="text-gray-500">Chưa có bình luận nào</p>
+                        </div>
+                    )}
                 </div>
-            </div>
-        </div>
-    );
+            )
+        },
+        {
+            key: "history",
+            label: "Lịch sử chỉnh sửa",
+            content: (post: any) => (
+                <div className="space-y-3">
+                    {post.history && post.history.length > 0 ? (
+                        <div className="relative">
+                            <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                            {post.history.map((item: any, index: number) => (
+                                <div key={index} className="flex items-start space-x-3 relative pl-8">
+                                    <div className={`absolute left-2.5 w-3 h-3 rounded-full border-2 border-white ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'
+                                        }`}></div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start">
+                                            <span className="font-medium text-sm">{item.action}</span>
+                                            <span className="text-xs text-gray-500">
+                                                {new Date(item.date).toLocaleDateString("vi-VN")}
+                                            </span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1">
+                                            bởi <span className="font-medium">{item.user}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8">
+                            <History className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                            <p className="text-gray-500">Chưa có lịch sử chỉnh sửa</p>
+                        </div>
+                    )}
+                </div>
+            )
+        }
+    ];
 
     // Actions cho mỗi row
     const actions = (post: any) => (
@@ -187,10 +255,11 @@ export default function AdminPostList() {
                 <ExpandableTable
                     data={posts}
                     columns={columns}
-                    expandedContent={expandedContent}
+                    tabs={tabs}
                     loading={loading}
                     emptyMessage="Chưa có bài viết nào"
                     actions={actions}
+                    defaultTab="details" // Tab mặc định khi mở
                 />
             </CardContent>
 

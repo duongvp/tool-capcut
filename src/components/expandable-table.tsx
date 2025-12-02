@@ -1,21 +1,23 @@
 // components/ExpandableTable.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Minus } from "lucide-react";
 
 // Props interface
 interface ExpandableTableProps<T> {
     data: T[];
     columns: ColumnDef<T>[];
-    expandedContent: (item: T) => React.ReactNode;
+    expandedContent?: (item: T) => React.ReactNode;
+    tabs?: TabDef<T>[]; // Thêm tabs
     loading?: boolean;
     emptyMessage?: string;
     onRowClick?: (item: T) => void;
     actions?: (item: T) => React.ReactNode;
+    defaultTab?: string; // Tab mặc định
 }
 
 interface ColumnDef<T> {
@@ -23,6 +25,12 @@ interface ColumnDef<T> {
     header: string;
     render: (item: T) => React.ReactNode;
     className?: string;
+}
+
+interface TabDef<T> {
+    key: string;
+    label: string;
+    content: (item: T) => React.ReactNode;
 }
 
 // Custom icon component với animation
@@ -45,14 +53,89 @@ const ExpandIcon = ({ isExpanded }: { isExpanded: boolean }) => {
     );
 };
 
+// Tabs component sử dụng Shadcn Tabs
+const TabbedContent = <T,>({
+    item,
+    tabs,
+    defaultTab
+}: {
+    item: T;
+    tabs: TabDef<T>[];
+    defaultTab?: string;
+}) => {
+    const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.key || "");
+
+    const listRef = useRef<HTMLDivElement>(null);
+    const underlineRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const list = listRef.current;
+        const underline = underlineRef.current;
+
+        if (!list || !underline) return;
+
+        const activeEl = list.querySelector('[data-state="active"]') as HTMLElement;
+        if (!activeEl) return;
+
+        underline.style.width = `${activeEl.offsetWidth}px`;
+        underline.style.left = `${activeEl.offsetLeft}px`;
+    }, [activeTab]);
+
+    return (
+        <div className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <div className="relative">
+                    <TabsList
+                        ref={listRef}
+                        className="w-full justify-start h-auto p-0 bg-transparent border-b rounded-none relative"
+                    >
+                        {tabs.map((tab) => (
+                            <TabsTrigger
+                                key={tab.key}
+                                value={tab.key}
+                                className="
+                                    relative px-4 py-2 text-sm font-medium rounded-none
+                                    data-[state=active]:text-primary
+                                    data-[state=active]:bg-transparent
+                                    data-[state=active]:border-none
+                                    data-[state=active]:shadow-none
+                                    text-gray-500 hover:text-gray-700
+                                    transition-all duration-200
+                                "
+                            >
+                                {tab.label}
+                            </TabsTrigger>
+                        ))}
+
+                        {/* Underline chạy */}
+                        <div
+                            ref={underlineRef}
+                            className="absolute bottom-0 h-[2px] bg-primary transition-all duration-300"
+                        />
+                    </TabsList>
+                </div>
+
+                {tabs.map((tab) => (
+                    <TabsContent key={tab.key} value={tab.key} className="mt-4">
+                        <div className="animate-in fade-in duration-300">
+                            {tab.content(item)}
+                        </div>
+                    </TabsContent>
+                ))}
+            </Tabs>
+        </div>
+    );
+};
+
 export function ExpandableTable<T extends { id: number | string }>({
     data,
     columns,
     expandedContent,
+    tabs,
     loading = false,
     emptyMessage = "Không có dữ liệu",
-    onRowClick,
-    actions
+    actions,
+    defaultTab
 }: ExpandableTableProps<T>) {
     const [expandedRows, setExpandedRows] = useState<(number | string)[]>([]);
 
@@ -148,11 +231,19 @@ export function ExpandableTable<T extends { id: number | string }>({
                                 )}
                             </TableRow>
 
-                            {/* Row chi tiết */}
+                            {/* Row chi tiết với tabs */}
                             <TableRow className={isExpanded(item.id) ? "bg-muted/50" : "hidden"}>
                                 <TableCell colSpan={columns.length + 2} className="p-0">
                                     <CollapsibleContent className="p-4 transition-all duration-200 ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
-                                        {expandedContent(item)}
+                                        {tabs ? (
+                                            <TabbedContent
+                                                item={item}
+                                                tabs={tabs}
+                                                defaultTab={defaultTab}
+                                            />
+                                        ) : expandedContent ? (
+                                            expandedContent(item)
+                                        ) : null}
                                     </CollapsibleContent>
                                 </TableCell>
                             </TableRow>
