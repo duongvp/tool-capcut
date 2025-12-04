@@ -1,105 +1,139 @@
-import { ChevronDown } from "lucide-react"
+import {
+    ChevronDown,
+    Home,
+    Images,
+    Users,
+    Star,
+    FileText,
+    Mail,
+    Briefcase,
+    FolderKanban,
+    UserCog,
+    Settings,
+    LogOut
+} from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { MenuItem } from "@/types/menu"
 import Dashboard from "@/features/admin/dashboard/page"
-import SplitVoice from "@/features/admin/splitVoice/page"
 import Blog from "@/features/admin/blog/page"
-import BlogCreate from "@/features/admin/blog/create/page"
-import Users from "@/features/admin/user/page"
+import UsersPage from "@/features/admin/user/page"
 import { Link } from "react-router-dom"
+import { Button } from "./ui/button"
+
 
 export const items: MenuItem[] = [
-    { title: "Tổng quan", path: "/", element: <Dashboard /> },
-    { title: "Bài viết", path: "/blog", element: <Blog /> },
-    // { title: "Blog", path: "/blog/create", element: <BlogCreate /> },
-    // { title: "Split Voice", path: "/split-voice", element: <SplitVoice /> },
-    // {
-    //     title: "Settings",
-    //     children: [
-    //         {
-    //             title: "Users",
-    //             children: [
-    //                 {
-    //                     title: "Roles",
-    //                     children: [
-    //                         { title: "Edit", path: "/settings/users/roles/edit", element: <div>Edit Role</div> },
-    //                     ],
-    //                 },
-    //             ],
-    //         },
-    //         { title: "Reports", path: "/settings/reports", element: <div>Reports Page</div> },
-    //     ],
-    // },
-    { title: "Cài đặt trang", path: "/users", element: <Users /> },
-    { title: "Banner", path: "/users", element: <Users /> },
-    { title: "Liên hệ", path: "/users", element: <Users /> },
-    { title: "Quản lý tuyển dụng", path: "/users", element: <Users /> },
-    { title: "Đối tác", path: "/users", element: <Users /> },
-    { title: "Thành viên", path: "/users", element: <Users /> },
-    { title: "Đánh giá", path: "/users", element: <Users /> },
-    { title: "Dự án dịch vụ", path: "/users", element: <Users /> },
-    { title: "Ảnh dự án", path: "/users", element: <Users /> },
-    { title: "Dịch vụ", path: "/users", element: <Users /> },
-    { title: "Quản trị viên", path: "/users", element: <Users /> },
-]
-
-export const items2: MenuItem[] = [
-    {
-        title: "soray",
-        children: [
-            {
-                title: "model",
-                children: [
-                    {
-                        title: "rotate",
-                        children: [
-                            { title: "Edit", path: "/settings/users/rotate/edit", element: <div>Edit rotate</div> },
-                        ],
-                    },
-                ],
-            },
-            { title: "message", path: "/chat/message", element: <div>message Page</div> },
-        ],
-    },
+    { title: "Tổng quan", path: "/", element: <Dashboard />, icon: Home },
+    { title: "Quản lý Banner", path: "/banners", element: <UsersPage />, icon: Images },
+    { title: "Đối tác / Khách hàng", path: "/partners", element: <UsersPage />, icon: Users },
+    { title: "Đội ngũ / Ban lãnh đạo", path: "/team", element: <UsersPage />, icon: Users },
+    { title: "Đánh giá khách hàng", path: "/reviews", element: <UsersPage />, icon: Star },
+    { title: "Blog – Tin tức", path: "/blog", element: <Blog />, icon: FileText },
+    { title: "Dự án dịch vụ", path: "/projects", element: <UsersPage />, icon: FolderKanban },
+    { title: "Liên hệ - Khách hàng", path: "/contacts", element: <UsersPage />, icon: Mail },
+    { title: "Tuyển dụng", path: "/recruitment", element: <UsersPage />, icon: Briefcase },
+    { title: "Quản trị viên", path: "/admins", element: <UsersPage />, icon: UserCog },
+    { title: "Cài đặt hệ thống", path: "/system-settings", element: <UsersPage />, icon: Settings },
 ]
 
 export const sidebarGroups = [
     {
         label: "Menu",
-        items,
+        items: [
+            items[0], // Tổng quan
+            items[1], // Quản lý Banner
+            items[2], // Đối tác / Khách hàng
+            items[3], // Đội ngũ / Ban lãnh đạo
+        ]
     },
     {
-        label: "Projects",
-        items: items2,
+        label: "Quản lý nội dung",
+        items: [
+            items[4], // Blog Quản lý
+            items[5], // Dự án dịch vụ
+        ]
+    },
+    {
+        label: "Quản lý người dùng",
+        items: [
+            items[6], // Liên hệ
+            items[7], // Tuyển dụng
+            items[8], // Quản trị viên
+            items[9], // Người dùng
+        ]
+    },
+    {
+        label: "Hệ thống",
+        items: [
+            items[10], // Cài đặt hệ thống
+        ]
     },
 ]
 
 export function AppSidebar() {
     return (
         <Sidebar>
+            <SidebarHeader className="bg-white border-b border-gray-200 dark:border-gray-800 p-4">
+                <img src="/logo.png" className="h-[44px] object-contain" alt="logo" />
+            </SidebarHeader>
             <SidebarContent className="bg-white border-0 outline-0">
                 {sidebarGroups.map((group) => (
                     <SidebarGroup key={group.label}>
-                        <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-                        <SidebarGroupContent>
+                        {/* <img src="/logo.png" className="h-[44px] object-contain" alt="logo" /> */}
+                        <div className="px-2 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {group.label}
+                        </div>
+                        <SidebarGroupContent className="pt-2">
                             <SidebarMenu className="border-0">{renderMenuItems(group.items)}</SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
                 ))}
             </SidebarContent>
+            <SidebarFooter className="bg-white border-t border-gray-200 dark:border-gray-800 p-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                            <AvatarImage src="/avatar-placeholder.jpg" alt="User" />
+                            <AvatarFallback className="bg-blue-100 text-blue-600">
+                                AG
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                Nguyễn Văn A
+                            </h4>
+                        </div>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <LogOut className="h-4 w-4" />
+                    </Button>
+                </div>
+                {/* Copyright */}
+                <div className="pt-3 border-gray-100 dark:border-gray-800 text-center">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        © 2025 ASIA GROUP
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                        v2.1.0 • Đang hoạt động
+                    </p>
+                </div>
+            </SidebarFooter>
         </Sidebar>
     )
 }
+
 // Hàm đệ quy render menu
 function renderMenuItems(items: any[]) {
     return items.map((item) => {
@@ -124,7 +158,6 @@ function renderMenuItems(items: any[]) {
                             ))}
                         </SidebarMenu>
                     </CollapsibleContent>
-
                 </Collapsible>
             )
         }
@@ -132,8 +165,8 @@ function renderMenuItems(items: any[]) {
         return (
             <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
-                    <Link to={item.path}>
-                        {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                    <Link to={item.path} className="h-[40px] flex items-center gap-2">
+                        {item.icon && <item.icon className="h-4 w-4" />}
                         <span>{item.title}</span>
                     </Link>
                 </SidebarMenuButton>
