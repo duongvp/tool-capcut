@@ -18,7 +18,6 @@ import {
     SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
@@ -30,57 +29,64 @@ import type { MenuItem } from "@/types/menu"
 import Dashboard from "@/features/admin/dashboard/page"
 import Blog from "@/features/admin/blog/page"
 import UsersPage from "@/features/admin/user/page"
+import BannerPage from "@/features/admin/banner/page"
+import ProjectsPage from "@/features/admin/projects/page"
+import PartnersPage from "@/features/admin/partners/page"
+import ReviewsPage from "@/features/admin/reviews/page"
+import TeamsPage from "@/features/admin/teams/page"
+import RecruitmentsPage from "@/features/admin/recruitments/page"
+import ContactsPage from "@/features/admin/contacts/page"
 import { Link } from "react-router-dom"
 import { Button } from "./ui/button"
 
 
 export const items: MenuItem[] = [
     { title: "Tổng quan", path: "/", element: <Dashboard />, icon: Home },
-    { title: "Quản lý Banner", path: "/banners", element: <UsersPage />, icon: Images },
-    { title: "Đối tác / Khách hàng", path: "/partners", element: <UsersPage />, icon: Users },
-    { title: "Đội ngũ / Ban lãnh đạo", path: "/team", element: <UsersPage />, icon: Users },
-    { title: "Đánh giá khách hàng", path: "/reviews", element: <UsersPage />, icon: Star },
-    { title: "Blog – Tin tức", path: "/blog", element: <Blog />, icon: FileText },
-    { title: "Dự án dịch vụ", path: "/projects", element: <UsersPage />, icon: FolderKanban },
-    { title: "Liên hệ - Khách hàng", path: "/contacts", element: <UsersPage />, icon: Mail },
-    { title: "Tuyển dụng", path: "/recruitment", element: <UsersPage />, icon: Briefcase },
+    { title: "Quản lý Banner", path: "/banners", element: <BannerPage />, icon: Images },
+    { title: "Đối tác / Khách hàng", path: "/partners", element: <PartnersPage />, icon: Users },
+    { title: "Đội ngũ / Ban lãnh đạo", path: "/teams", element: <TeamsPage />, icon: Users },
+    { title: "Đánh giá khách hàng", path: "/reviews", element: <ReviewsPage />, icon: Star },
+    { title: "Blog – Tin tức", path: "/blogs", element: <Blog />, icon: FileText },
+    { title: "Dự án dịch vụ", path: "/projects", element: <ProjectsPage />, icon: FolderKanban },
+    { title: "Liên hệ - Khách hàng", path: "/contacts", element: <ContactsPage />, icon: Mail },
+    { title: "Tuyển dụng", path: "/recruitments", element: <RecruitmentsPage />, icon: Briefcase },
     { title: "Quản trị viên", path: "/admins", element: <UsersPage />, icon: UserCog },
-    { title: "Cài đặt hệ thống", path: "/system-settings", element: <UsersPage />, icon: Settings },
+    { title: "Cài đặt hệ thống", path: "/system-settings", element: <></>, icon: Settings },
 ]
 
 export const sidebarGroups = [
     {
-        label: "Menu",
+        label: "Tổng quan",
         items: [
-            items[0], // Tổng quan
-            items[1], // Quản lý Banner
-            items[2], // Đối tác / Khách hàng
-            items[3], // Đội ngũ / Ban lãnh đạo
-        ]
+            items[0], // Dashboard
+        ],
     },
     {
         label: "Quản lý nội dung",
         items: [
-            items[4], // Blog Quản lý
-            items[5], // Dự án dịch vụ
-        ]
+            items[1], // Banner
+            items[2], // Đối tác / KH
+            items[3], // Đội ngũ
+            items[4], // Đánh giá
+            items[5], // Blog
+            items[6], // Dự án dịch vụ
+            items[7], // Liên hệ
+            items[8], // Tuyển dụng
+        ],
     },
     {
         label: "Quản lý người dùng",
         items: [
-            items[6], // Liên hệ
-            items[7], // Tuyển dụng
-            items[8], // Quản trị viên
-            items[9], // Người dùng
-        ]
+            items[9], // Admin
+        ],
     },
     {
         label: "Hệ thống",
         items: [
             items[10], // Cài đặt hệ thống
-        ]
+        ],
     },
-]
+];
 
 export function AppSidebar() {
     return (
@@ -92,10 +98,10 @@ export function AppSidebar() {
                 {sidebarGroups.map((group) => (
                     <SidebarGroup key={group.label}>
                         {/* <img src="/logo.png" className="h-[44px] object-contain" alt="logo" /> */}
-                        <div className="px-2 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <div className="px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             {group.label}
                         </div>
-                        <SidebarGroupContent className="pt-2">
+                        <SidebarGroupContent className="pt-1">
                             <SidebarMenu className="border-0">{renderMenuItems(group.items)}</SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
@@ -121,7 +127,7 @@ export function AppSidebar() {
                     </Button>
                 </div>
                 {/* Copyright */}
-                <div className="pt-3 border-gray-100 dark:border-gray-800 text-center">
+                <div className=" border-gray-100 dark:border-gray-800 text-center">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                         © 2025 ASIA GROUP
                     </p>

@@ -244,7 +244,7 @@ export default function AdminPostList() {
             <CardHeader className="flex flex-row items-center justify-end py-3">
                 <Button onClick={() => navigate("/blog/create")}>
                     <Plus className="w-4 h-4" />
-                    Người dùng
+                    Thêm bài viết
                 </Button>
             </CardHeader>
 

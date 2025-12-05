@@ -1,5 +1,3 @@
-// pages/AdminPostList.tsx
-"use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
@@ -246,7 +244,7 @@ export default function AdminPostList() {
             <CardHeader className="flex flex-row items-center justify-end py-3">
                 <Button onClick={() => navigate("/blog/create")}>
                     <Plus className="w-4 h-4" />
-                    Banner
+                    Thêm đội ngũ
                 </Button>
             </CardHeader>
 
