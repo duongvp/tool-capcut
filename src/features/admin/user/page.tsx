@@ -1,18 +1,16 @@
-// pages/AdminPostList.tsx
-"use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
-import { Pencil, Trash2, Plus, MessageSquare, History } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import { ExpandableTable } from "@/components/expandable-table";
+import { UpdateUserModal } from "./components/UpdateUserModal";
 
 const fakePosts = [
     {
         id: 1,
-        title: "Giới thiệu công ty ABC",
+        title: "admin",
         category: "tin-tuc",
         thumbnail: "https://picsum.photos/200/200?1",
         status: true,
@@ -38,9 +36,11 @@ const fakePosts = [
 ];
 
 export default function AdminPostList() {
-    const navigate = useNavigate();
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<"create" | "edit">("create");
 
     useEffect(() => {
         setTimeout(() => {
@@ -49,38 +49,57 @@ export default function AdminPostList() {
         }, 0);
     }, []);
 
-    const deletePost = (id: number) => {
-        if (!confirm("Xác nhận xóa bài viết?")) return;
-        setPosts((prev) => prev.filter((p) => p.id !== id));
+    const handleCreateClick = () => {
+        setSelectedUser(null);
+        setIsUpdateModalOpen(true);
+        setModalMode("create");
     };
+    const handleUpdateClick = (userData: any) => {
+        const user = {
+            username: userData.title,
+            fullName: userData.category,
+            email: "superadmin@warehouse.com",
+            phone: "0912345678",
+            branch: "hanoi",
+            role: "admin",
+            isCurrentUser: true
+        };
+
+        setSelectedUser(user);
+        setModalMode("edit");
+        setIsUpdateModalOpen(true);
+    };
+
 
     // Định nghĩa columns
     const columns = [
         {
             key: "title",
-            header: "Tiêu đề",
+            header: "Tên đăng nhập",
             render: (post: any) => <span className="font-medium">{post.title}</span>
         },
         {
             key: "category",
-            header: "Danh mục",
+            header: "Tên người dùng",
             render: (post: any) => <Badge variant="outline">{post.category}</Badge>
         },
         {
             key: "createdAt",
-            header: "Ngày đăng",
+            header: "Thời gian khởi tạo",
             render: (post: any) =>
                 new Date(post.createdAt).toLocaleDateString("vi-VN")
         },
         {
-            key: "status",
+            key: "createdAt",
+            header: "Thời gian cập nhật",
+            render: (post: any) =>
+                new Date(post.createdAt).toLocaleDateString("vi-VN")
+        },
+        {
+            key: "createdAt",
             header: "Trạng thái",
             render: (post: any) =>
-                post.status ? (
-                    <Badge className="bg-green-500 text-white">Đã đăng</Badge>
-                ) : (
-                    <Badge variant="secondary">Nháp</Badge>
-                )
+                new Date(post.createdAt).toLocaleDateString("vi-VN")
         }
     ];
 
@@ -90,181 +109,80 @@ export default function AdminPostList() {
             key: "details",
             label: "Thông tin",
             content: (post: any) => (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                    <div className="space-y-4">
-                        <div>
-                            <h4 className="font-medium text-gray-700 mb-2">Mô tả</h4>
-                            <p className="text-gray-600">{post.description}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <span className="text-gray-500 block text-sm">Tác giả</span>
-                                <span className="font-medium">{post.author}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-500 block text-sm">Lượt xem</span>
-                                <span className="font-medium">{post.views.toLocaleString()}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="space-y-4">
-                        <div>
-                            <h4 className="font-medium text-gray-700 mb-2">Thống kê</h4>
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="text-center p-2 bg-blue-50 rounded">
-                                    <div className="font-bold text-blue-600">{post.stats?.likes || 0}</div>
-                                    <div className="text-xs text-gray-500">Likes</div>
-                                </div>
-                                <div className="text-center p-2 bg-green-50 rounded">
-                                    <div className="font-bold text-green-600">{post.stats?.shares || 0}</div>
-                                    <div className="text-xs text-gray-500">Shares</div>
-                                </div>
-                                <div className="text-center p-2 bg-purple-50 rounded">
-                                    <div className="font-bold text-purple-600">{post.stats?.comments || 0}</div>
-                                    <div className="text-xs text-gray-500">Comments</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 className="font-medium text-gray-700 mb-2">Tags</h4>
-                            <div className="flex flex-wrap gap-1">
-                                {post.tags.map((tag: string, index: number) => (
-                                    <Badge
-                                        key={index}
-                                        variant="secondary"
-                                        className="text-xs"
-                                    >
-                                        {tag}
-                                    </Badge>
-                                ))}
-                            </div>
-                        </div>
+                <div className="grid grid-cols-1 text-sm">
+                    <table className="w-full table-auto">
+                        <tbody>
+                            <tr>
+                                <td className="font-medium py-2 w-[200px]">Tên đăng nhập:</td>
+                                <td className="py-2">{post.title}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-medium py-2">Tên người dùng:</td>
+                                <td className="py-2">{post.category}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-medium py-2">Số điện thoại:</td>
+                                <td className="py-2">{new Date(post.createdAt).toLocaleDateString("vi-VN")}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-medium py-2">Email:</td>
+                                <td className="py-2">{post.status ? "Kích hoạt" : "Vô hiệu hóa"}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div className="flex justify-end mt-4">
+                        <Button
+                            variant="default"
+                            onClick={() => handleUpdateClick(post)}
+                            className="flex items-center gap-2"
+                        >
+                            <RefreshCw size={20} />
+                            Cập nhật
+                        </Button>
                     </div>
                 </div>
             )
         },
-        {
-            key: "comments",
-            label: "Bình luận",
-            content: (post: any) => (
-                <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
-                    {post.comments && post.comments.length > 0 ? (
-                        post.comments.map((comment: any) => (
-                            <div key={comment.id} className="border-l-2 border-blue-500 pl-4 py-3 bg-blue-50/50 rounded-r">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <span className="text-xs font-bold text-blue-600">
-                                                {comment.user.charAt(0)}
-                                            </span>
-                                        </div>
-                                        <span className="font-medium text-sm">{comment.user}</span>
-                                    </div>
-                                    <span className="text-xs text-gray-500">
-                                        {new Date(comment.date).toLocaleDateString("vi-VN")}
-                                    </span>
-                                </div>
-                                <p className="text-sm text-gray-700 mt-2 ml-8">{comment.content}</p>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="text-center py-8">
-                            <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                            <p className="text-gray-500">Chưa có bình luận nào</p>
-                        </div>
-                    )}
-                </div>
-            )
-        },
-        {
-            key: "history",
-            label: "Lịch sử chỉnh sửa",
-            content: (post: any) => (
-                <div className="space-y-3">
-                    {post.history && post.history.length > 0 ? (
-                        <div className="relative">
-                            <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                            {post.history.map((item: any, index: number) => (
-                                <div key={index} className="flex items-start space-x-3 relative pl-8">
-                                    <div className={`absolute left-2.5 w-3 h-3 rounded-full border-2 border-white ${index === 0 ? 'bg-blue-500' : 'bg-gray-300'
-                                        }`}></div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start">
-                                            <span className="font-medium text-sm">{item.action}</span>
-                                            <span className="text-xs text-gray-500">
-                                                {new Date(item.date).toLocaleDateString("vi-VN")}
-                                            </span>
-                                        </div>
-                                        <div className="text-xs text-gray-500 mt-1">
-                                            bởi <span className="font-medium">{item.user}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-8">
-                            <History className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                            <p className="text-gray-500">Chưa có lịch sử chỉnh sửa</p>
-                        </div>
-                    )}
-                </div>
-            )
-        }
     ];
 
-    // Actions cho mỗi row
-    const actions = (post: any) => (
-        <>
-            <Button
-                size="sm"
-                variant="outline"
-                data-action="edit"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/admin/posts/${post.id}/edit`);
-                }}
-            >
-                <Pencil className="w-4 h-4" />
-            </Button>
-            <Button
-                size="sm"
-                variant="destructive"
-                data-action="delete"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    deletePost(post.id);
-                }}
-            >
-                <Trash2 className="w-4 h-4" />
-            </Button>
-        </>
-    );
-
     return (
-        <Card className="w-full h-full border-0 shadow-none rounded-md">
-            <CardHeader className="flex flex-row items-center justify-end py-3">
-                <Button onClick={() => navigate("/blog/create")}>
-                    <Plus className="w-4 h-4" />
-                    Người dùng
-                </Button>
-            </CardHeader>
+        <>
+            <Card className="w-full h-full border-0 shadow-none rounded-md">
+                <CardHeader className="flex flex-row items-center justify-end py-3">
+                    <Button onClick={handleCreateClick}>
+                        <Plus className="w-4 h-4" />
+                        Người dùng
+                    </Button>
+                </CardHeader>
 
-            <CardContent>
-                <ExpandableTable
-                    data={posts}
-                    columns={columns}
-                    tabs={tabs}
-                    loading={loading}
-                    emptyMessage="Chưa có bài viết nào"
-                    actions={actions}
-                    defaultTab="details" // Tab mặc định khi mở
+                <CardContent>
+                    <ExpandableTable
+                        data={posts}
+                        columns={columns}
+                        tabs={tabs}
+                        loading={loading}
+                        emptyMessage="Chưa có bài viết nào"
+                        defaultTab="details"
+                    />
+                </CardContent>
+
+                <CardFooter className="flex justify-end">
+                    <Pagination totalItems={posts.length} pageSize={5} currentPage={1} onPageChange={() => { }} />
+                </CardFooter>
+            </Card>
+
+            {isUpdateModalOpen && (
+                <UpdateUserModal
+                    isOpen={isUpdateModalOpen}
+                    onClose={() => {
+                        setIsUpdateModalOpen(false);
+                        setSelectedUser(null);
+                    }}
+                    user={selectedUser}
+                    mode={modalMode}
                 />
-            </CardContent>
+            )}
 
-            <CardFooter className="flex justify-end">
-                <Pagination totalItems={posts.length} pageSize={5} currentPage={1} onPageChange={() => { }} />
-            </CardFooter>
-        </Card>
+        </>
     );
 }

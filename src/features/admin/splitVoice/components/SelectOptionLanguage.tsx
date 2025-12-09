@@ -133,7 +133,7 @@ export function ComboboxForm() {
                 <Button
                     type="submit"
                     className=" self-start"
-                    variant={"translate"}
+                    variant={"link"}
                 >
                     <Languages />
                     Translate

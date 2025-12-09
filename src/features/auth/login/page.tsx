@@ -41,7 +41,7 @@ export default function LoginPage() {
 
     const onSubmit = (values: any) => {
         console.log("Login data: ", values)
-        navigate("/blog")
+        navigate("/blogs")
         // API call here ✅
     }
 
