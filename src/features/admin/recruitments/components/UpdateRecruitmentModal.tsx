@@ -54,7 +54,7 @@ export function UpdateRecruitmentModal({ isOpen, onClose, recruitment, mode }: U
         position: z.string().min(1, "Vị trí là bắt buộc"),
         department: z.string().min(1, "Phòng ban là bắt buộc"),
         location: z.string().min(1, "Địa điểm là bắt buộc"),
-        quantity: z.coerce.number().min(1, "Số lượng phải ít nhất là 1"),
+        quantity: z.number().min(1, "Số lượng phải ít nhất là 1"),
         status: z.string().min(1, "Trạng thái là bắt buộc"),
         salary: z.string().min(1, "Mức lương là bắt buộc"),
         deadline: z.string().min(1, "Hạn nộp hồ sơ là bắt buộc"),
